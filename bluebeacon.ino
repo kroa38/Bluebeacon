@@ -81,6 +81,7 @@ TMP117 tmp(TMP117_ADDR);
 ************************************************************************/
 void setup()   /*----( SETUP: RUNS ONCE )----*/
 {
+    USBCON = 0;
     pinMode(TEST_PIN,OUTPUT);
     digitalWrite(TEST_PIN,LOW);
     pinMode(DONE_PIN,OUTPUT);

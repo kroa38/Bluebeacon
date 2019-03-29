@@ -18,7 +18,6 @@
 #include "Adafruit_BME680.h"
 #include <Wire.h>
 /* Pre-Processor directive --------------------------------------------------*/
-#undef USB_POWERED
 #undef  DEBUG_TO_USB_SERIAL
 /* Private define ------------------------------------------------------------*/
 #define TMP117_ADDR 0x48
@@ -29,7 +28,7 @@
 #define TEST_PIN 9
 #define BATT_PIN A0
 #define UUID_PREFIX "2332A4C2"    // UUID prefix
-#define UUID_SENSOR "01"          // put here the sensor number
+#define UUID_SENSOR "02"          // put here the sensor number
 #define UUID_LENGTH 41
 #define MAJOR_LENGTH 13
 #define MINOR_LENGTH 13
