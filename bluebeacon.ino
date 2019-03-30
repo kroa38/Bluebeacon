@@ -261,14 +261,14 @@ void bme680_read_data(void)
     val = val *100;
     pSsens.bme_hum = (uint16_t)(val);             // return humidity as 3365
     /****************************************************************************************/    
-    val = bme.pressure;                           // return pressure as float ex 101523.5687pa
-    pSsens.bme_press = (uint16_t)(val/10);        // return 101523
+    val = bme.pressure;                           // return pressure as float ex 995.2Hpa
+    pSsens.bme_press = (uint16_t)(val/10);        // return 9952
     /***************************************************************************************/
-    val = bme.readAltitude(SEALEVELPRESSURE_HPA); // return alt as 223.25m 
-    pSsens.bme_alt = (uint16_t)(val);             // retrun alt as 223m
+    val = bme.readAltitude(SEALEVELPRESSURE_HPA); // return alt as 223m 
+    pSsens.bme_alt = (uint16_t)(val);             // return alt as 223
     /**************************************************************************************/
     valgas = bme.gas_resistance;                  // return resistance as ohms ex : 447756 
-    pSsens.bme_gas = (uint16_t)(valgas/1000);     // return in Kilo Ohms
+    pSsens.bme_gas = (uint16_t)(valgas/1000);     // return 447
 }
 
 
