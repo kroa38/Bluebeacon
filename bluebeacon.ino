@@ -81,14 +81,16 @@ TMP117 tmp(TMP117_ADDR);
 ************************************************************************/
 void setup()   /*----( SETUP: RUNS ONCE )----*/
 {
-    USBCON = 0;
-    pinMode(TEST_PIN,OUTPUT);
+    USBCON = 0;                     // disable USB for no enumeration
+    configure_wdt(WDT_16MS);        // configure watchdog
+    pinMode(TEST_PIN,OUTPUT);       // debug pin
     digitalWrite(TEST_PIN,LOW);
-    pinMode(DONE_PIN,OUTPUT);
+    pinMode(DONE_PIN,OUTPUT);       // Done-Pin for TPL5110
     digitalWrite(DONE_PIN,LOW);
+    test_pin(1);
     analogReference(INTERNAL);      // internal ref at 2.56V
     Serial1.begin(19200);           // UART at 19200 baud
-	  Serial1.setTimeout(15);
+	  Serial1.setTimeout(15);         // serial time out at 15ms
     bme680_configure(BME_ON);       // init BME680
 }
 /************************************************************************
@@ -98,7 +100,7 @@ void setup()   /*----( SETUP: RUNS ONCE )----*/
 ************************************************************************/
 void loop() 
 {
-    configure_wdt(WDT_16MS);                // watchdog enabled at 16mS    
+    configure_wdt(WDT_16MS);                // watchdog enabled at 16mS  
     bme680_read_data();                     // read value from BME680
     bme680_configure(BME_OFF);              // power off BME680
     tmp117_read_data();                     // read value from TMP117
@@ -115,7 +117,8 @@ void loop()
     at_ack &= ble_send_AT("AT+BCON1",4);    // CC2540 radio ON
     sleep(15);                              // sleep 32U4 during broadcast
     at_ack &= ble_send_AT("AT+BCON0",10);   // CC2540 radio OFF
-    if (!at_ack)  reset_by_wdt();           // reset               
+    if (!at_ack)  reset_by_wdt();           // reset 
+    test_pin(1);          
     digitalWrite(DONE_PIN,HIGH);            // Power OFF if in battery mode 
     configure_wdt(WDT_1S);                  // not appends in battery mode
     for(byte i=0; i<225; i++)               // sleep for 15min if USB powered
@@ -156,21 +159,21 @@ void ble_build_major()
 void ble_build_uuid()
 {
   String str,rndstr;
-  byte randNumber;
+  uint16_t randNumber;
     
   randomSeed(analogRead(1));            // true random number !!
-  randNumber = (byte)(random(16,255));
-  rndstr  = String(randNumber,HEX);     // frame identifier
+  randNumber = (uint16_t)(random(0X1000,0xFFFF));
+  rndstr  = uint_to_string(randNumber);     // frame identifier
 
   str = "AT+PUID=";
-  str += UUID_PREFIX;
-  str += rndstr;
-  str += UUID_SENSOR;
-  str += uint_to_string(pSsens.batt_value);
-  str += uint_to_string(pSsens.bme_temp);
-  str += uint_to_string(pSsens.bme_alt);
-  str += uint_to_string(pSsens.bme_press);
-  str += uint_to_string(pSsens.bme_gas);
+  str += UUID_PREFIX;                       //  "2332A4C2"
+  str += rndstr;                            //  "1F45"
+  str += SENSOR_TYPE;                       //  "01"
+  str += SENSOR_NUMBER;                     //  "01"
+  str += uint_to_string(pSsens.batt_value); //  "0135"
+  str += uint_to_string(pSsens.bme_alt);    //  "0254"
+  str += uint_to_string(pSsens.bme_press);  //  "4515"
+  str += uint_to_string(pSsens.bme_gas);    //  "0045"
   str.toCharArray(uuid, UUID_LENGTH);
 }
 /************************************************************************
@@ -284,7 +287,7 @@ void bme680_configure(byte mode_init)
   {
 
   // Set up oversampling and filter initialization
-  bme.begin();                    // check if BME ok  
+  bme.begin();                    // check if BME ok 
   bme.setTemperatureOversampling(BME680_OS_8X);
   bme.setHumidityOversampling(BME680_OS_2X);
   bme.setPressureOversampling(BME680_OS_4X);

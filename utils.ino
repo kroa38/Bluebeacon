@@ -68,13 +68,12 @@ void sleep(int ncycles)
 ************************************************************************/
 void reset_by_wdt(void)
 {
-  test_pin(1);
+  Wire.endTransmission();
   Serial1.end();
-  delay(1000);
+  delay(2000);
   cli();                              // disable interrupt
   WDTCSR |= (1U<<WDCE) | (1U<<WDE) ;  // Enable a watchdog change
   WDTCSR = (1U<<WDE) ;                // Watchdog ON and Time Out = 16ms
-  test_pin(1);
   while(1U);
 }
 /************************************************************************
@@ -82,14 +81,20 @@ void reset_by_wdt(void)
   * @param  delay in ms
   * @retval none
 ************************************************************************/
+#pragma GCC push_options
+#pragma GCC optimize("O0")  
 void test_pin(byte dly)
 {
     digitalWrite(TEST_PIN,HIGH);
-    delay(dly);
+    asm("nop");
+    asm("nop");
+//    delay(dly);
     digitalWrite(TEST_PIN,LOW);
-    delay(dly);
+    asm("nop");
+    asm("nop");
+//    delay(dly);
 }
-
+#pragma GCC pop_options
 /************************************************************************
   * @brief  debug_serial (debug at 19200baud on the USB port
   * @param  type, and string
