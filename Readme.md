@@ -13,16 +13,16 @@ Use one 14500 Lithium Ion battery (3.6v)
 ### Example : UUID = 2332A4C2-xx01-0e63-04dc-00f726ed014a
 
 2332A4C2 = Sensor UUID prefix  
-xx01 = Sensor number with xx random number for identify frame  
-0e63 = battery value in hex :  3.683V  
-04dc = temperature from BME680 : +24.4°C  
-00f7 = altitude in meter : 247m  
-26ed = pressure in Hpa : 996.5Hpa  
-014a = gaz resistor in Kohms : 330Kohms  
+XXXX     = Random number for identify frame  
+AABB     = AA Sensor Type, BB Sensor Number  
+0E44     = Battery voltage : 3.652V
+00f7     = altitude in meter : 247m  
+26ed     = pressure in Hpa : 996.5Hpa  
+014a     = gaz resistor in Kohms : 330Kohms  
 ### Example : MAJOR = 1247  
-1247 = temperature from TMP117 : +24.7C   
+1247     = temperature from TMP117 : +24.7C   
 ### Example : MINOR = 4889
-4889 = Relative Humidity in % : 48.89%
+4889     = Relative Humidity in % : 48.89%
 
 -----------------------------------------------------------------
 # Setup !
