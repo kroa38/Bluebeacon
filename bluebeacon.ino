@@ -68,6 +68,7 @@ char uuid[UUID_LENGTH];
 char major[UUID_LENGTH];
 char minor[UUID_LENGTH];
 bool at_ack = true;
+bool in_voltage = P3V;
 
 /* Private handle ---------------------------------------------------------*/
 Adafruit_BME680 bme; // I2C
@@ -91,6 +92,7 @@ void setup()   /*----( SETUP: RUNS ONCE )----*/
     analogReference(INTERNAL);      // internal ref at 2.56V
     Serial1.begin(19200);           // UART at 19200 baud
 	  Serial1.setTimeout(15);         // serial time out at 15ms
+    adc_read_data();                // read battery voltage and set power mode
     bme680_configure(BME_ON);       // init BME680
 }
 /************************************************************************
@@ -101,10 +103,10 @@ void setup()   /*----( SETUP: RUNS ONCE )----*/
 void loop() 
 {
     configure_wdt(WDT_16MS);                // watchdog enabled at 16mS  
+    if (in_voltage == P5V) adc_read_data(); // read battery voltage in VBUS mode.
     bme680_read_data();                     // read value from BME680
     bme680_configure(BME_OFF);              // power off BME680
     tmp117_read_data();                     // read value from TMP117
-    adc_read_data();                        // read battery voltage
     debug_serial();                         // for debug (USB with Boot must be enable on 32U4)
     /***********************/
     ble_build_uuid();                       // construct UUID string
@@ -123,7 +125,7 @@ void loop()
     configure_wdt(WDT_1S);                  // not appends in battery mode
     for(byte i=0; i<225; i++)               // sleep for 15min if USB powered
     {                                      
-    sleep(4);                               // 4*225*1 = 900s = 15min 
+      sleep(4);                             // 4*225*1 = 900s = 15min 
     }
 }
 
@@ -159,18 +161,19 @@ void ble_build_major()
 void ble_build_uuid()
 {
   String str,rndstr;
-  uint16_t randNumber;
-    
-  randomSeed(analogRead(1));            // true random number !!
-  randNumber = (uint16_t)(random(0X1000,0xFFFF));
-  rndstr  = uint_to_string(randNumber);     // frame identifier
+//  uint16_t randNumber;
+//    
+//  randomSeed(analogRead(1));            // true random number !!
+//  randNumber = (uint16_t)(random(0X1000,0xFFFF));
+//  rndstr  = uint_to_string(randNumber);     // frame identifier
 
   str = "AT+PUID=";
   str += UUID_PREFIX;                       //  "2332A4C2"
-  str += rndstr;                            //  "1F45"
+//str += rndstr;                            //  "1F45"
   str += SENSOR_TYPE;                       //  "01"
   str += SENSOR_NUMBER;                     //  "01"
   str += uint_to_string(pSsens.batt_value); //  "0135"
+  str += uint_to_string(pSsens.bme_temp); //  "0135"  
   str += uint_to_string(pSsens.bme_alt);    //  "0254"
   str += uint_to_string(pSsens.bme_press);  //  "4515"
   str += uint_to_string(pSsens.bme_gas);    //  "0045"
@@ -293,20 +296,20 @@ void bme680_configure(byte mode_init)
   bme.setPressureOversampling(BME680_OS_4X);
   bme.setIIRFilterSize(BME680_FILTER_SIZE_3);
 
-  if (USBSTA & 0x01)			     // detect if powered by USB
+  if (in_voltage == P5V)			    // detect if powered by USB
   {
-	  bme.setGasHeater(320,150); // enable gas function 320*C for 150 ms
-    return;                   // no need to power off
+	  bme.setGasHeater(320,150);    // enable gas function 320*C for 150 ms
+    return;                       // no need to power off
   }
   else
   {	  
-	  bme.setGasHeater(0,0);    // disable gas function  or set 320*C for 150 ms 
+	  bme.setGasHeater(0,0);        // disable gas function  or set 320*C for 150 ms 
   }
 
   }
   else if(mode_init == BME_OFF)
   {
-       if (USBSTA & 0x01)             // detect if powered by USB
+       if (in_voltage == P5V)             // detect if powered by USB
       {
         return;                       // no need to power off
       }   
@@ -373,4 +376,12 @@ void adc_read_data(void)
       val = 1000*(val*2*ADC_REFERENCE) / 1023;
    
     pSsens.batt_value = (uint16_t)(val);
+
+    if (pSsens.batt_value >= 3900)
+    {
+      in_voltage = P5V;
+    }
+    {
+      in_voltage = P3V;
+    }
 }

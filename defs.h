@@ -28,8 +28,8 @@
 #define TEST_PIN 9
 #define BATT_PIN A0
 #define UUID_PREFIX "2332A4C2"    // UUID prefix
-#define SENSOR_NUMBER "02"        // put here the sensor number
-#define SENSOR_TYPE "01"          // this identify type of sensor
+#define SENSOR_NUMBER "01"        // put here the sensor number
+#define SENSOR_TYPE "02"          // this identify type of sensor
 #define UUID_LENGTH 41
 #define MAJOR_LENGTH 13
 #define MINOR_LENGTH 13
@@ -46,7 +46,11 @@ enum BME_MODE
 	BME_ON = 0,
 	BME_OFF,
 };
-
+enum IN_VOLTAGE
+{
+  P3V = 0,
+  P5V,
+};
 /* Structures ---------------------------------------------------------*/
 typedef struct{
 	uint16_t batt_value;
