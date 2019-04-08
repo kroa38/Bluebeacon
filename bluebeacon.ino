@@ -117,7 +117,7 @@ void loop()
     at_ack &= ble_send_AT(minor,4);         // write minor to CC2540
     at_ack &= ble_send_AT(uuid,4);          // write uuid to CC2540
     at_ack &= ble_send_AT("AT+BCON1",4);    // CC2540 radio ON
-    sleep(15);                              // sleep 32U4 during broadcast
+    sleep(55);                              // sleep 32U4 during broadcast (1S)
     at_ack &= ble_send_AT("AT+BCON0",10);   // CC2540 radio OFF
     if (!at_ack)  reset_by_wdt();           // reset 
     test_pin(1);          

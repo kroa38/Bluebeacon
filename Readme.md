@@ -12,10 +12,10 @@ Use one 14500 Lithium Ion battery (3.6v)
 
 ### Example : UUID = 2332A4C2-xx01-0e63-04dc-00f726ed014a
 
-2332A4C2 = Sensor UUID prefix  
-XXXX     = Random number for identify frame  
+2332A4C2 = Sensor UUID prefix   
 AABB     = AA Sensor Type, BB Sensor Number  
 0E44     = Battery voltage : 3.652V  
+04f7     = temperature from BME680
 00f7     = altitude in meter : 247m  
 26ed     = pressure in Hpa : 996.5Hpa  
 014a     = gaz resistor in Kohms : 330Kohms  
@@ -31,15 +31,22 @@ Before using you must connect the module to USB port of your PC
 and configure it with the parameters below by using a the  
 Serialpassthrough arduino sketch at 9600 baud.
 
+```
 AT+NAME=MYNAME  -> set module name  
 AT+ADVI1        -> set 100ms advertising interval  
 AT+POWR1        -> set power at +4dBm  
 AT+ROLE0        -> set role as slave  
 AT+RESET        -> reset module  
 AT+BAUD1        -> set 19200 baud  
+````
 
 Once the ILT254s updated  you must use the SPI for the ATMEGA32U4 to  
 programm the software.  
 Flash the generated hex file by using SPI connexion.  
 Disable BOOTRST FUSE (this accelerate start-up)  
 Don't forget to update the UUID_SENSOR number in the "defs.h" for each module.  
+
+-----------------------------------------------------------------
+# Current Profile
+
+![Image](Current_Profile.png)
