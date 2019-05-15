@@ -377,10 +377,11 @@ void adc_read_data(void)
    
     pSsens.batt_value = (uint16_t)(val);
 
-    if (pSsens.batt_value >= 3900)
+    if (pSsens.batt_value >= 4350)
     {
       in_voltage = P5V;
     }
+		else
     {
       in_voltage = P3V;
     }
